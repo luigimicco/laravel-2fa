@@ -23,7 +23,7 @@ Route::prefix('2fa')->name('2fa.')->group(function(){
 
     Route::post('/store', 'Google2FAController@store')->name('store');
     Route::get('/enable', 'Google2FAController@enable')->name('enable');
-    Route::get('/disable', 'Google2FAController@disableTwoFactor')->name('disable');
+    Route::post('/disable', 'Google2FAController@disable')->name('disable');
 
     // 2fa middleware
     Route::post('/verify', function () {

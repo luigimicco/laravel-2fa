@@ -4,38 +4,56 @@
 <div class="container spark-screen">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
-            <div class="panel panel-default">
-                <div class="panel-heading">2FA Secret Key</div>
+            <div class="card card-default">
+                <div class="card-header">2FA with Google Authenticator</div>
 
-                <div class="panel-body">
+                <div class="card-body">
+
+                    <p>Two factor authentication (2FA) strengthens access security by requiring two methods (also referred to as factors) to verify your identity. Two factor authentication protects against phishing, social engineering and password brute force attacks and secures your logins from attackers exploiting weak or stolen credentials.</p>
+
+
 
                     @if(!Auth::user()->google2fa_secret)
 
-                        Open up your 2FA mobile app and scan the following QR barcode:
-                        <br />
-                        If your 2FA mobile app does not support QR barcodes, 
-                        enter in the following number: <code>{{ $secret }}</code>
-                        <br /><br />
+                        <div class="row">
+                            <div class="col-6">
 
-                        <div class="visible-print text-center">
-                            {!! $image !!}
-                        </div>
-                        
-                        <form class="form-horizontal" method="post" action="{{ route('2fa.store') }}">
-                            @csrf
-                            <div class="form-group{{ $errors->has('verify-code') ? ' has-error' : '' }}">
-                                <input type="hidden" name="secretcode" value="{{ $secret }}">
-                                <label for="secret" class="control-label">Authenticator Code</label>
-                                <input id="secret" type="text" class="form-control col-md-4" name="secret" required>
-                                @if ($errors->has('verify-code'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('verify-code') }}</strong>
-                                    </span>
-                                @endif
+
+                                1. Scan this QR code with your Google Authenticator App. Alternatively, you can use the code:: <strong><code>{{ $secret }}</code></strong>
+                                <br /><br />
+        
+                                <div class="visible-print text-center">
+                                    {!! $image !!}
+                                </div>
+                                
+                                <form class="form-horizontal" method="post" action="{{ route('2fa.store') }}">
+                                    @csrf
+                                    <div class="form-group{{ $errors->has('verify-code') ? ' has-error' : '' }}">
+                                        <input type="hidden" name="secretcode" value="{{ $secret }}">
+                                        <label for="secret" class="control-label">2. Enter the pin from Google Authenticator app:</label>
+                                        <input id="secret" type="text" class="form-control col-md-4" name="secret" required>
+                                        @if ($errors->has('verify-code'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('verify-code') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Enable 2FA</button>
+                                </form>                                
+
                             </div>
-                            <br />
-                            <button type="submit" class="btn btn-primary">Enable 2FA</button>
-                        </form>
+                            <div class="col-6">
+                                
+                                <div class="text-center">
+                                    <p>Get Google Authenticator</p>
+                                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=it&gl=US"><img src="{{ asset("images/playstore.png")}}" alt=""></a>
+                                    <a href="https://apps.apple.com/it/app/google-authenticator/id388497605"><img src="{{ asset("images/applestore.png")}}" width="153" height="46" alt=""></a>
+                                </div>
+                                
+                            </div>
+
+                        </div>
+
                     @else
                         <div class="alert alert-success">
                             2FA is currently <strong>enabled</strong> on your account.

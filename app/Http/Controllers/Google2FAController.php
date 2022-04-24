@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Auth\Authenticatable;
 use App\Http\Requests\ValidateSecretRequest;
 
+use Hash;
+
 class Google2FAController extends Controller
 {
     use ValidatesRequests;
@@ -76,9 +78,9 @@ class Google2FAController extends Controller
             //encrypt and then save secret
             $user->google2fa_secret = Crypt::encrypt($secretcode); 
             $user->save();
-            return view('home')->with('success', '2FA is enabled successfully.');
+            return redirect('home')->with('alert_type', 'success')->with('alert_message', "2FA is enabled successfully.");
         } else {
-            return view('home')->with('error', 'Invalid verification Code, Please try again.');
+            return redirect('home')->with('alert_type', 'danger')->with('alert_message', "Invalid verification Code, Please try again..");
         }
 
     }
@@ -90,13 +92,22 @@ class Google2FAController extends Controller
      */
     public function disable(Request $request)
     {
-        $user = $request->user();
 
-        //make secret column blank
+
+        if (!(Hash::check($request->get('current-password'), Auth::user()->password))) {
+            // The passwords matches
+            return redirect()->back()->with('alert_type', 'danger')->with('alert_message', "Your password does not matches with your account password. Please try again.");
+        }
+
+        $validatedData = $request->validate([
+            'current-password' => 'required',
+        ]);
+        $user = Auth::user();
         $user->google2fa_secret = null;
         $user->save();
+        return redirect('home')->with('alert_type', 'success')->with('alert_message', "2FA is now disabled.");
 
-        return view('2fa/disable');
+
     }
  
 
