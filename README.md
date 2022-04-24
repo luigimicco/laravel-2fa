@@ -1,6 +1,6 @@
 # Laravel con supporto 2FA
 
-Esempio di utilizzo in una applicazione Laravel con supporto per autenticazione a 2 fattori, che utilizza Google Authenticator
+Esempio di utilizzo di Google Authenticator in una applicazione Laravel per avere l'autenticazione a 2 fattori.
 
 
  [<img src="public/images/playstore.png">](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=it&gl=US)
