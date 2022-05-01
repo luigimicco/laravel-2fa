@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use App\Support\Google2FAAuthenticator;
 use Closure;
 
-class LoginSecurityMiddleware
+class Google2FAMiddleware
 {
     /**
      * Handle an incoming request.
