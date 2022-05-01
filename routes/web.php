@@ -21,15 +21,16 @@ Auth::routes();
 
 Route::prefix('2fa')->name('2fa.')->group(function(){
 
-    Route::post('/store', 'Google2FAController@store')->name('store');
-    Route::get('/enable', 'Google2FAController@enable')->name('enable');
-    Route::post('/disable', 'Google2FAController@disable')->name('disable');
+    Route::post('/set2FA', 'Google2FAController@set2FA')->name('set2FA');
+    Route::post('/unset2FA', 'Google2FAController@unset2FA')->name('unset2FA');
+    Route::get('/set', 'Google2FAController@enableDisable')->name('enableDisable');
 
     // 2fa middleware
     Route::post('/verify', function () {
         return redirect(URL()->previous());
     })->name('verify')->middleware('2fa');
 });
+
 //Route::post('/2fa/validate', ['middleware' => 'throttle:5', 'uses' => 'Auth\LoginController@postValidateToken']);
 
 /*

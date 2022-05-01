@@ -11,13 +11,10 @@
 
                     <p>Two factor authentication (2FA) strengthens access security by requiring two methods (also referred to as factors) to verify your identity. Two factor authentication protects against phishing, social engineering and password brute force attacks and secures your logins from attackers exploiting weak or stolen credentials.</p>
 
-
-
                     @if(!Auth::user()->google2fa_secret)
 
                         <div class="row">
                             <div class="col-6">
-
 
                                 1. Scan this QR code with your Google Authenticator App. Alternatively, you can use the code:: <strong><code>{{ $secret }}</code></strong>
                                 <br /><br />
@@ -26,7 +23,7 @@
                                     {!! $image !!}
                                 </div>
                                 
-                                <form class="form-horizontal" method="post" action="{{ route('2fa.store') }}">
+                                <form class="form-horizontal" method="post" action="{{ route('2fa.set2FA') }}">
                                     @csrf
                                     <div class="form-group{{ $errors->has('verify-code') ? ' has-error' : '' }}">
                                         <input type="hidden" name="secretcode" value="{{ $secret }}">
@@ -58,8 +55,8 @@
                         <div class="alert alert-success">
                             2FA is currently <strong>enabled</strong> on your account.
                         </div>
-                        <form class="form-horizontal" method="post" action="{{ route('2fa.disable') }}">
-                            @csrf;
+                        <form class="form-horizontal" method="post" action="{{ route('2fa.unset2FA') }}">
+                            @csrf
                             <div class="form-group{{ $errors->has('current-password') ? ' has-error' : '' }}">
                                 <label for="change-password" class="control-label">Current Password</label>
                                 <input id="current-password" type="password" class="form-control col-md-4" name="current-password" required>

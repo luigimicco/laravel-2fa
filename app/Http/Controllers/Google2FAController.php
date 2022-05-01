@@ -7,11 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
-use Cache;
+//use Cache;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\Auth\Authenticatable;
-use App\Http\Requests\ValidateSecretRequest;
-
+//use Illuminate\Contracts\Auth\Authenticatable;
 use Hash;
 
 class Google2FAController extends Controller
@@ -33,27 +31,32 @@ class Google2FAController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function enable(Request $request)
+    public function enableDisable(Request $request)
     {
-        //generate new secret
-        $google2fa = (new \PragmaRX\Google2FAQRCode\Google2FA());
-        $secret = $google2fa->generateSecretKey(); 
 
         //get user
         $user = $request->user();
 
-        //generate image for QR barcode
-        $imageDataUri = $google2fa->getQRCodeInline(
-            env('APP_NAME', $request->getHttpHost()),
-            $user->email,
-            $secret,
-            200
-        );
+        if ($user->google2fa_secret) {
+            return view('2fa/enable_disable');
+        } else {
+            //generate new secret
+            $google2fa = (new \PragmaRX\Google2FAQRCode\Google2FA());
+            $secret = $google2fa->generateSecretKey();
 
-        return view('2fa/enable', [
-            'image' => $imageDataUri,
-            'secret' => $secret
-        ]);
+            //generate image for QR barcode
+            $imageDataUri = $google2fa->getQRCodeInline(
+                env('APP_NAME', $request->getHttpHost()),
+                $user->email,
+                $secret,
+                200
+            );
+
+            return view('2fa/enable_disable', [
+                'image' => $imageDataUri,
+                'secret' => $secret
+            ]);
+        }
     }
 
     /**
@@ -61,7 +64,7 @@ class Google2FAController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function set2FA(Request $request)
     {
 
         $google2fa = (new \PragmaRX\Google2FAQRCode\Google2FA());
@@ -73,16 +76,15 @@ class Google2FAController extends Controller
 
 
         // check code
-        $valid =$google2fa->verifyKey($secretcode, $secret);
+        $valid = $google2fa->verifyKey($secretcode, $secret);
         if ($valid) {
             //encrypt and then save secret
-            $user->google2fa_secret = Crypt::encrypt($secretcode); 
+            $user->google2fa_secret = Crypt::encrypt($secretcode);
             $user->save();
             return redirect('home')->with('alert_type', 'success')->with('alert_message', "2FA is enabled successfully.");
         } else {
             return redirect('home')->with('alert_type', 'danger')->with('alert_message', "Invalid verification Code, Please try again..");
         }
-
     }
 
     /**
@@ -90,25 +92,20 @@ class Google2FAController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function disable(Request $request)
+    public function unset2FA(Request $request)
     {
-
+        $validatedData = $request->validate([
+            'current-password' => 'required',
+        ]);
 
         if (!(Hash::check($request->get('current-password'), Auth::user()->password))) {
             // The passwords matches
             return redirect()->back()->with('alert_type', 'danger')->with('alert_message', "Your password does not matches with your account password. Please try again.");
         }
 
-        $validatedData = $request->validate([
-            'current-password' => 'required',
-        ]);
         $user = Auth::user();
         $user->google2fa_secret = null;
         $user->save();
         return redirect('home')->with('alert_type', 'success')->with('alert_message', "2FA is now disabled.");
-
-
     }
- 
-
 }
